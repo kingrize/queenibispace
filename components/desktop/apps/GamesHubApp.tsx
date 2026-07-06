@@ -48,7 +48,7 @@ export default function GamesHubApp() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               whileHover={game.isReady ? { y: -5 } : {}}
-              onClick={() => game.isReady && openApp(game.id, game.title, game.icon)}
+              onClick={() => game.isReady && openApp(game.id, game.title, <game.icon className="w-5 h-5" />)}
               className="h-full"
             >
               <Card 

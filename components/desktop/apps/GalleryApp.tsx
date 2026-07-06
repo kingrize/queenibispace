@@ -343,7 +343,7 @@ export default function GalleryApp() {
             <div className="flex flex-col gap-1.5">
               <label className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center justify-between">
                 <span>Upload Target</span>
-                <HelpCircle className="w-3.5 h-3.5 text-muted-foreground/50" title="Select which backend proxy server handles your file." />
+                <span title="Select which backend proxy server handles your file."><HelpCircle className="w-3.5 h-3.5 text-muted-foreground/50" /></span>
               </label>
               <div className="flex items-center bg-black/5 dark:bg-white/10 p-1 rounded-[10px]">
                 {[
