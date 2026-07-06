@@ -15,12 +15,12 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  // Focus password field if email is provided (for local testing/macOS feel)
-  useEffect(() => {
-    if (email) {
+  const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && email) {
+      e.preventDefault();
       passwordRef.current?.focus();
     }
-  }, [email]);
+  };
 
   if (loading) {
     return (
@@ -93,6 +93,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={handleEmailKeyDown}
               placeholder="Email address"
               disabled={isSubmitting}
               className="w-full h-11 px-4 bg-white/20 hover:bg-white/30 focus:bg-white/30 border border-white/20 rounded-full text-white placeholder:text-white/60 outline-none transition-all text-center backdrop-blur-xl shadow-inner text-[15px]"
