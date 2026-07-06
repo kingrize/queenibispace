@@ -63,7 +63,7 @@ export const Taskbar = () => {
   windows.forEach((w) => {
     if (w.id === "settings") return;
     if (!taskbarApps.find((p) => p.id === w.id)) {
-      taskbarApps.push({ id: w.id, title: w.title, icon: w.icon || Home });
+      taskbarApps.push({ id: w.id, title: w.title, icon: (w.icon as any) || Home });
     }
   });
 
