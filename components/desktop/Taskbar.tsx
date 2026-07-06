@@ -58,7 +58,7 @@ export const Taskbar = () => {
   const { windows, openApp, minimizeApp, focusApp, activeWindowId } = useDesktop();
   const mouseX = useMotionValue(Infinity);
 
-  const taskbarApps = [...PINNED_APPS];
+  const taskbarApps: { id: string; title: string; icon: any }[] = [...PINNED_APPS];
   
   windows.forEach((w) => {
     if (w.id === "settings") return;

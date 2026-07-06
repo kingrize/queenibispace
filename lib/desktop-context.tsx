@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useCallback, ReactNode } fr
 export interface WindowState {
   id: string;
   title: string;
-  icon?: React.ReactNode; // Lucide icon
+  icon?: any; // Lucide icon
   isMinimized: boolean;
   isMaximized: boolean;
   zIndex: number;
@@ -14,7 +14,7 @@ export interface WindowState {
 interface DesktopContextType {
   windows: WindowState[];
   activeWindowId: string | null;
-  openApp: (id: string, title: string, icon?: React.ReactNode) => void;
+  openApp: (id: string, title: string, icon?: any) => void;
   closeApp: (id: string) => void;
   minimizeApp: (id: string) => void;
   maximizeApp: (id: string) => void;
@@ -49,7 +49,7 @@ export const DesktopProvider = ({ children }: { children: ReactNode }) => {
     setActiveWindowId(id);
   }, [zIndexCounter]);
 
-  const openApp = useCallback((id: string, title: string, icon?: React.ReactNode) => {
+  const openApp = useCallback((id: string, title: string, icon?: any) => {
     setWindows((prev) => {
       const exists = prev.find((w) => w.id === id);
       if (exists) {

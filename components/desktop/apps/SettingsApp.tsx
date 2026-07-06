@@ -22,7 +22,7 @@ const SettingRow = ({
   children,
   subtitle
 }: { 
-  icon?: React.ReactNode; 
+  icon?: any; 
   iconBg?: string; 
   title: string; 
   children?: React.ReactNode;
