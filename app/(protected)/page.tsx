@@ -9,6 +9,8 @@ import { Taskbar } from "@/components/desktop/Taskbar";
 import { Wallpaper } from "@/components/desktop/Wallpaper";
 import { MediaProvider } from "@/lib/media-context";
 import { DynamicIsland } from "@/components/desktop/DynamicIsland";
+import { BootScreen } from "@/components/desktop/BootScreen";
+import { AnimatePresence } from "framer-motion";
 
 // Import the Apps
 import GalleryApp from "@/components/desktop/apps/GalleryApp";
@@ -38,12 +40,17 @@ export default function DesktopEnvironment() {
   // A small trick to prevent hydration mismatch for random positions if we had them,
   // but we use static grid for icons to keep it clean.
   const [mounted, setMounted] = useState(false);
+  const [isBooting, setIsBooting] = useState(true);
+
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
   return (
     <MediaProvider>
+      <AnimatePresence>
+        {isBooting && <BootScreen onComplete={() => setIsBooting(false)} />}
+      </AnimatePresence>
       <div className="relative w-full h-screen overflow-hidden">
         {/* Dynamic Island (Media Player) */}
         <DynamicIsland />

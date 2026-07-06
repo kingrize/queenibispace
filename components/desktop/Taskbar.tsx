@@ -88,7 +88,7 @@ export const Taskbar = () => {
       <div 
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
-        className="glass-taskbar pointer-events-auto h-[72px] rounded-[24px] px-3 flex items-end justify-center relative"
+        className="glass-taskbar pointer-events-auto h-[72px] rounded-[24px] px-3 flex items-end justify-center relative max-w-[95vw] overflow-x-auto overflow-y-hidden hide-scrollbar"
       >
         {taskbarApps.map((app) => (
           <DockIcon 

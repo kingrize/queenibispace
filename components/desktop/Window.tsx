@@ -48,7 +48,12 @@ export const Window = React.memo(({ windowState, children }: WindowProps) => {
         position: "absolute",
         ...(windowState.isMaximized
           ? { top: 0, left: 0, right: 0, bottom: "4rem", width: "100%", height: "calc(100% - 4rem)" }
-          : { top: "10%", left: "15%", width: "70%", maxWidth: "900px", height: "70vh" }),
+          : { 
+              top: "max(2vh, calc(50vh - 350px))", 
+              left: "max(2vw, calc(50vw - 450px))", 
+              width: "min(96vw, 900px)", 
+              height: "min(85vh, 700px)" 
+            }),
       }}
       className={`glass-panel rounded-3xl overflow-hidden flex flex-col transition-shadow duration-300 border ${
         isActive ? "border-primary/40 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.2)] ring-1 ring-primary/20" : "border-white/40 dark:border-white/10"
