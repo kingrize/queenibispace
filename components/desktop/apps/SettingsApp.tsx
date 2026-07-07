@@ -28,7 +28,7 @@ const SettingRow = ({
   children?: React.ReactNode;
   subtitle?: string;
 }) => (
-  <div className="flex items-center justify-between px-4 py-2.5 min-h-[44px]">
+  <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 min-h-[44px] gap-2">
     <div className="flex items-center gap-3">
       {Icon && (
         <div className={`w-7 h-7 rounded-md flex items-center justify-center text-white shadow-sm ${iconBg}`}>
@@ -65,11 +65,11 @@ export default function SettingsApp() {
     <div className="flex flex-col h-full bg-[#f2f2f7] dark:bg-[#000000] font-sans selection:bg-primary/20">
       
       {/* Hidden top bar space for traffic lights */}
-      <div className="h-12 w-full shrink-0 border-b border-black/5 dark:border-white/5 bg-white/40 dark:bg-[#1c1c1e]/40 backdrop-blur-md flex items-center justify-center">
+      <div className="h-10 sm:h-12 w-full shrink-0 border-b border-black/5 dark:border-white/5 bg-white/40 dark:bg-[#1c1c1e]/40 backdrop-blur-md flex items-center justify-center">
         <span className="text-[13px] font-semibold text-foreground/80">System Settings</span>
       </div>
 
-      <div className="flex-1 p-5 overflow-y-auto custom-scrollbar space-y-6 max-w-2xl mx-auto w-full pb-10">
+      <div className="flex-1 p-3 sm:p-5 overflow-y-auto custom-scrollbar space-y-5 sm:space-y-6 max-w-2xl mx-auto w-full pb-10">
         
         {/* Profile Group */}
         {user && (
@@ -138,7 +138,7 @@ export default function SettingsApp() {
                   <button
                     key={t.id}
                     onClick={() => setTheme(t.id as ThemeOption)}
-                    className={`relative flex items-center justify-center px-3 py-1 text-[13px] font-medium rounded-md transition-all duration-200 ${
+                    className={`relative flex items-center justify-center px-2 sm:px-3 py-1 text-[12px] sm:text-[13px] font-medium rounded-md transition-all duration-200 ${
                       theme === t.id 
                         ? "text-foreground shadow-sm bg-white dark:bg-[#3a3a3c]" 
                         : "text-muted-foreground hover:text-foreground"
@@ -180,7 +180,7 @@ export default function SettingsApp() {
             
             {wallpaperMode === "slideshow" && (
               <SettingRow title="Transition Speed" subtitle="Time between image changes">
-                <div className="flex items-center gap-3 w-48">
+                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-48">
                   <span className="text-[11px] text-muted-foreground">Fast</span>
                   <input
                     type="range"
@@ -197,7 +197,7 @@ export default function SettingsApp() {
             )}
 
             <SettingRow title="Blur Intensity" subtitle="Frosted glass effect behind windows">
-              <div className="flex items-center gap-3 w-48">
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-48">
                 <span className="text-[11px] text-muted-foreground">Low</span>
                 <input
                   type="range"
@@ -225,7 +225,7 @@ export default function SettingsApp() {
                 <div className="pt-2">
                   <SettingGroup>
                     <div className="p-4 bg-white/30 dark:bg-black/10">
-                      <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 max-h-56 overflow-y-auto p-1 custom-scrollbar">
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3 max-h-56 overflow-y-auto p-1 custom-scrollbar">
                         {SKY_IMAGES.map((_, idx) => (
                           <button
                             key={idx}

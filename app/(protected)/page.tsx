@@ -58,7 +58,7 @@ export default function DesktopEnvironment() {
         {/* Desktop Wallpaper */}
       <Wallpaper />
 
-      <div className="relative z-10 p-4 flex flex-col gap-2 items-start content-start flex-wrap h-[calc(100vh-5rem)]">
+      <div className="relative z-10 p-3 sm:p-4 flex flex-row flex-wrap sm:flex-col gap-1 sm:gap-2 items-start content-start sm:flex-wrap h-[calc(100vh-5rem)] sm:h-[calc(100vh-5rem)]">
         <DesktopIcon id="gallery" title="Gallery" icon={Flower2} delay={0.1} />
         <DesktopIcon id="notes" title="Notes" icon={FileText} delay={0.15} />
         <DesktopIcon id="games" title="Minigames" icon={Gamepad2} delay={0.2} />

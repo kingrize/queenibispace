@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { motion, useMotionValue, useSpring, useTransform, MotionValue } from "framer-motion";
 import { useDesktop } from "@/lib/desktop-context";
 import { Flower2, Gamepad2, Settings, Home, FileText, Music, MessageCircle } from "lucide-react";
+import { useIsMobile } from "@/lib/use-is-mobile";
 
 const PINNED_APPS = [
   { id: "chat", title: "Messages", icon: MessageCircle },
@@ -13,8 +14,8 @@ const PINNED_APPS = [
   { id: "games", title: "Minigames", icon: Gamepad2 },
 ];
 
-function DockIcon({ app, isActive, isOpen, onClick, mouseX, isSettings = false, isSettingsRotated = false }: {
-  app: any, isActive: boolean, isOpen: boolean, onClick: (app: any) => void, mouseX: MotionValue, isSettings?: boolean, isSettingsRotated?: boolean
+function DockIcon({ app, isActive, isOpen, onClick, mouseX, isSettings = false, isSettingsRotated = false, isMobile = false }: {
+  app: any, isActive: boolean, isOpen: boolean, onClick: (app: any) => void, mouseX: MotionValue, isSettings?: boolean, isSettingsRotated?: boolean, isMobile?: boolean
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   
@@ -23,16 +24,18 @@ function DockIcon({ app, isActive, isOpen, onClick, mouseX, isSettings = false, 
     return val - bounds.x - bounds.width / 2;
   });
 
-  const widthSync = useTransform(distance, [-150, 0, 150], [56, 80, 56]);
+  // On mobile, use fixed sizes (no magnification since there's no hover)
+  const mobileSize = 44;
+  const widthSync = useTransform(distance, [-150, 0, 150], isMobile ? [mobileSize, mobileSize, mobileSize] : [56, 80, 56]);
   const width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 });
 
   return (
-    <div className="relative h-full flex items-end justify-center px-1 pb-2">
+    <div className={`relative h-full flex items-end justify-center pb-1.5 sm:pb-2 ${isMobile ? "px-0.5" : "px-1"}`}>
       <motion.button
         ref={ref}
         style={{ width, height: width }}
         onClick={() => onClick(app)}
-        className={`relative flex items-center justify-center rounded-[18px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 origin-bottom ${
+        className={`relative flex items-center justify-center rounded-[14px] sm:rounded-[18px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 origin-bottom ${
           isActive ? "bg-white/20 dark:bg-white/10 shadow-sm" : "hover:bg-white/30 dark:hover:bg-white/10"
         }`}
         title={app.title}
@@ -57,6 +60,7 @@ function DockIcon({ app, isActive, isOpen, onClick, mouseX, isSettings = false, 
 export const Taskbar = () => {
   const { windows, openApp, minimizeApp, focusApp, activeWindowId } = useDesktop();
   const mouseX = useMotionValue(Infinity);
+  const isMobile = useIsMobile();
 
   const taskbarApps: { id: string; title: string; icon: any }[] = [...PINNED_APPS];
   
@@ -83,12 +87,18 @@ export const Taskbar = () => {
 
   return (
     <div 
-      className="fixed bottom-0 left-0 right-0 h-32 pointer-events-none z-[100] flex items-end justify-center pb-4"
+      className={`fixed bottom-0 left-0 right-0 pointer-events-none z-[100] flex items-end justify-center ${
+        isMobile ? "h-20 pb-1" : "h-32 pb-4"
+      }`}
     >
       <div 
         onMouseMove={(e) => mouseX.set(e.pageX)}
         onMouseLeave={() => mouseX.set(Infinity)}
-        className="glass-taskbar pointer-events-auto h-[72px] rounded-[24px] px-3 flex items-end justify-center relative max-w-[95vw] overflow-x-auto overflow-y-hidden hide-scrollbar"
+        className={`glass-taskbar pointer-events-auto flex items-end justify-center relative max-w-[95vw] overflow-x-auto overflow-y-hidden hide-scrollbar ${
+          isMobile 
+            ? "h-[56px] rounded-[18px] px-2" 
+            : "h-[72px] rounded-[24px] px-3"
+        }`}
       >
         {taskbarApps.map((app) => (
           <DockIcon 
@@ -98,10 +108,11 @@ export const Taskbar = () => {
             isOpen={!!windows.find((w) => w.id === app.id)}
             onClick={handleAppClick}
             mouseX={mouseX}
+            isMobile={isMobile}
           />
         ))}
 
-        <div className="w-px h-10 bg-border/40 mx-2 mb-4 rounded-full"></div>
+        <div className={`w-px bg-border/40 rounded-full ${isMobile ? "h-7 mx-1 mb-3" : "h-10 mx-2 mb-4"}`}></div>
 
         <DockIcon 
           app={{ id: "settings", title: "Settings", icon: Settings }}
@@ -110,7 +121,8 @@ export const Taskbar = () => {
           onClick={handleAppClick}
           mouseX={mouseX}
           isSettings={true}
-          isSettingsRotated={isSettingsOpen || false} // Add hover rotation in icon class normally, but this is simpler
+          isSettingsRotated={isSettingsOpen || false}
+          isMobile={isMobile}
         />
       </div>
     </div>

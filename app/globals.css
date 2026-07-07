@@ -121,6 +121,34 @@
     color: var(--foreground);
     font-family: var(--font-sans);
     overflow: hidden; /* Desktop is a fixed viewport */
+    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+  }
+  
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+
+  /* Custom scrollbar for all scrollable areas */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.15) transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.15);
+    border-radius: 9999px;
+  }
+  .dark .custom-scrollbar {
+    scrollbar-color: rgba(255,255,255,0.15) transparent;
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.15);
   }
 }
 

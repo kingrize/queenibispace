@@ -40,13 +40,13 @@ export const DesktopIcon = ({ id, title, icon: Icon, delay = 0 }: DesktopIconPro
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay, type: "spring", stiffness: 300, damping: 20 }}
       onClick={() => openApp(id, title, Icon)}
-      className="flex flex-col items-center gap-1 p-2 w-[88px] rounded-xl hover:bg-black/10 dark:hover:bg-white/10 group focus-visible:outline-none focus-visible:bg-black/10 dark:focus-visible:bg-white/10 transition-colors duration-200"
+      className="flex flex-col items-center gap-1 p-1.5 sm:p-2 w-[76px] sm:w-[88px] rounded-xl hover:bg-black/10 dark:hover:bg-white/10 group focus-visible:outline-none focus-visible:bg-black/10 dark:focus-visible:bg-white/10 transition-colors duration-200"
     >
-      <div className={`w-16 h-16 rounded-[16px] flex items-center justify-center shadow-md border ${getAppStyle(id)} group-active:brightness-75 transition-all duration-200`}>
-        <Icon className="w-8 h-8 drop-shadow-sm" strokeWidth={1.5} />
+      <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-[14px] sm:rounded-[16px] flex items-center justify-center shadow-md border ${getAppStyle(id)} group-active:brightness-75 transition-all duration-200`}>
+        <Icon className="w-7 h-7 sm:w-8 sm:h-8 drop-shadow-sm" strokeWidth={1.5} />
       </div>
       <span 
-        className="text-[13px] font-medium text-white text-center leading-tight tracking-wide w-full truncate px-1"
+        className="text-[11px] sm:text-[13px] font-medium text-white text-center leading-tight tracking-wide w-full truncate px-1"
         style={{ textShadow: '0px 1px 3px rgba(0,0,0,0.8), 0px 1px 8px rgba(0,0,0,0.5)' }}
       >
         {title}

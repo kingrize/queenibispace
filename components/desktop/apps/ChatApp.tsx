@@ -5,7 +5,7 @@ import { db } from "@/lib/firebase";
 import { collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp, Timestamp } from "firebase/firestore";
 import { useAuth } from "@/lib/auth-context";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Users, Search, Image as ImageIcon, Smile, Paperclip } from "lucide-react";
+import { Send, Users, Search, Image as ImageIcon, Smile, Paperclip, ChevronLeft } from "lucide-react";
 
 interface ChatMessage {
   id: string;
@@ -21,6 +21,7 @@ export default function ChatApp() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Fetch messages in real-time
   useEffect(() => {
@@ -75,8 +76,8 @@ export default function ChatApp() {
   return (
     <div className="flex h-full bg-[#ececec] dark:bg-[#1e1e1e] font-sans overflow-hidden text-foreground">
       
-      {/* Sidebar */}
-      <div className="w-[280px] shrink-0 bg-[#f5f5f7]/80 dark:bg-[#2c2c2e]/80 backdrop-blur-xl border-r border-black/10 dark:border-white/10 flex flex-col z-10">
+      {/* Sidebar - hidden on mobile when viewing chat */}
+      <div className={`${showSidebar ? 'flex' : 'hidden'} md:flex w-full md:w-[280px] shrink-0 bg-[#f5f5f7]/80 dark:bg-[#2c2c2e]/80 backdrop-blur-xl border-r border-black/10 dark:border-white/10 flex-col z-10`}>
         {/* Top Spacer for Traffic Lights */}
         <div className="h-[52px] shrink-0 flex items-center px-4 pt-1">
           <div className="w-[60px]" /> {/* Traffic lights spacer */}
@@ -96,7 +97,10 @@ export default function ChatApp() {
 
         {/* Conversation List */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
-          <div className="flex items-center gap-3 p-2 bg-[#007aff] text-white rounded-lg cursor-pointer">
+          <div 
+            className="flex items-center gap-3 p-2 bg-[#007aff] text-white rounded-lg cursor-pointer"
+            onClick={() => setShowSidebar(false)}
+          >
             <img 
               src={partnerAvatar}
               alt={partnerName}
@@ -117,11 +121,18 @@ export default function ChatApp() {
         </div>
       </div>
 
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white dark:bg-[#1c1c1e] relative">
+      {/* Main Chat Area - hidden on mobile when viewing sidebar */}
+      <div className={`${!showSidebar ? 'flex' : 'hidden'} md:flex flex-1 flex-col bg-white dark:bg-[#1c1c1e] relative`}>
         
         {/* Header */}
-        <div className="h-[52px] shrink-0 bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 flex items-center px-6 z-10">
+        <div className="h-[52px] shrink-0 bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-xl border-b border-black/5 dark:border-white/5 flex items-center px-4 sm:px-6 z-10">
+          {/* Back button on mobile */}
+          <button 
+            onClick={() => setShowSidebar(true)}
+            className="md:hidden mr-2 p-1.5 -ml-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 text-[#007aff] transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
           <div className="flex flex-col">
             <span className="font-semibold text-[13px]">To: {partnerName}</span>
             <span className="text-[11px] text-muted-foreground">{messages.length} messages</span>
@@ -129,7 +140,7 @@ export default function ChatApp() {
         </div>
 
         {/* Messages List */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 custom-scrollbar">
           {messages.length === 0 && (
             <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
               <Users className="w-12 h-12 mb-3 opacity-20" />
@@ -151,16 +162,16 @@ export default function ChatApp() {
                   transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   className={`flex ${isMe ? 'justify-end' : 'justify-start'} ${isConsecutive ? 'mt-1' : 'mt-4'}`}
                 >
-                  <div className={`flex items-end max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
+                  <div className={`flex items-end max-w-[85%] sm:max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'} gap-2`}>
                     
                     {/* Avatar for others */}
                     {!isMe && (
-                      <div className="w-7 h-7 shrink-0">
+                      <div className="w-6 h-6 sm:w-7 sm:h-7 shrink-0">
                         {showAvatar && (
                           <img 
                             src={msg.userAvatar} 
                             alt={msg.userName} 
-                            className="w-7 h-7 rounded-full object-cover shadow-sm bg-black/5 dark:bg-white/5"
+                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full object-cover shadow-sm bg-black/5 dark:bg-white/5"
                           />
                         )}
                       </div>
@@ -174,7 +185,7 @@ export default function ChatApp() {
                       
                       {/* Bubble */}
                       <div 
-                        className={`px-4 py-2 text-[14px] leading-relaxed shadow-sm ${
+                        className={`px-3 sm:px-4 py-2 text-[14px] leading-relaxed shadow-sm ${
                           isMe 
                             ? 'bg-[#007aff] text-white rounded-2xl rounded-br-sm' 
                             : 'bg-[#e9e9eb] dark:bg-[#3a3a3c] text-black dark:text-white rounded-2xl rounded-bl-sm'
@@ -192,7 +203,7 @@ export default function ChatApp() {
         </div>
 
         {/* Input Area */}
-        <div className="p-4 bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-xl border-t border-black/5 dark:border-white/5 shrink-0">
+        <div className="p-3 sm:p-4 bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur-xl border-t border-black/5 dark:border-white/5 shrink-0">
           {!user ? (
             <div className="text-center p-3 text-sm text-muted-foreground bg-black/5 dark:bg-white/5 rounded-full">
               Please sign in to send messages.
@@ -200,9 +211,9 @@ export default function ChatApp() {
           ) : (
             <form 
               onSubmit={handleSendMessage}
-              className="flex items-center gap-2 bg-black/5 dark:bg-white/10 rounded-full px-4 py-2 border border-black/5 dark:border-white/10 focus-within:border-black/20 dark:focus-within:border-white/20 transition-colors"
+              className="flex items-center gap-2 bg-black/5 dark:bg-white/10 rounded-full px-3 sm:px-4 py-2 border border-black/5 dark:border-white/10 focus-within:border-black/20 dark:focus-within:border-white/20 transition-colors"
             >
-              <button type="button" className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+              <button type="button" className="text-muted-foreground hover:text-foreground transition-colors shrink-0 hidden sm:block">
                 <Paperclip className="w-5 h-5" />
               </button>
               

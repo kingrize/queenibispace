@@ -176,7 +176,7 @@ export default function GalleryApp() {
     <div className="flex flex-col h-full bg-[#fdfdfc] dark:bg-[#000000] font-sans">
       
       {/* macOS Style Toolbar */}
-      <div className="h-16 shrink-0 sticky top-0 z-10 bg-white/70 dark:bg-[#1c1c1e]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/10 px-5 flex items-center justify-between">
+      <div className="h-12 sm:h-16 shrink-0 sticky top-0 z-10 bg-white/70 dark:bg-[#1c1c1e]/70 backdrop-blur-[40px] border-b border-black/5 dark:border-white/10 px-3 sm:px-5 flex items-center justify-between gap-2">
         
         {/* Invisible spacer for window controls */}
         <div className="w-16 h-full flex items-center">
@@ -190,26 +190,26 @@ export default function GalleryApp() {
               placeholder="Search..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-48 h-7 pl-8 pr-3 text-[12px] bg-black/5 dark:bg-white/10 border border-transparent focus:border-blue-500 rounded-md outline-none text-foreground placeholder:text-muted-foreground transition-all"
+              className="w-32 sm:w-48 h-7 pl-8 pr-3 text-[12px] bg-black/5 dark:bg-white/10 border border-transparent focus:border-blue-500 rounded-md outline-none text-foreground placeholder:text-muted-foreground transition-all"
             />
           </div>
           
           <button 
             onClick={() => setShowUploadModal(true)} 
             disabled={isUploading}
-            className="h-7 px-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white rounded-md text-[12px] font-medium flex items-center gap-1.5 transition-colors shadow-sm"
+            className="h-7 px-2 sm:px-3 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white rounded-md text-[12px] font-medium flex items-center gap-1 sm:gap-1.5 transition-colors shadow-sm shrink-0"
           >
             {isUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-            {isUploading ? "Uploading..." : "Import"}
+            <span className="hidden sm:inline">{isUploading ? "Uploading..." : "Import"}</span>
           </button>
         </div>
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-6">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-3 sm:p-6">
         {loading ? (
           // Skeleton Loader
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+          <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-6 space-y-3 sm:space-y-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="break-inside-avoid bg-black/5 dark:bg-white/5 animate-pulse rounded-[18px] h-64 border border-black/5 dark:border-white/5"></div>
             ))}
@@ -235,7 +235,7 @@ export default function GalleryApp() {
           </div>
         ) : (
           // Masonry Grid Squircles
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6 pb-10">
+          <div className="columns-2 sm:columns-2 md:columns-3 lg:columns-4 gap-3 sm:gap-6 space-y-3 sm:space-y-6 pb-10">
             <AnimatePresence>
               {filteredMemories.map((memory) => (
                 <motion.div
@@ -245,7 +245,7 @@ export default function GalleryApp() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="break-inside-avoid relative rounded-[20px] overflow-hidden cursor-pointer group bg-black/5 dark:bg-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-black/5 dark:border-white/10 transition-all duration-300"
+                  className="break-inside-avoid relative rounded-[14px] sm:rounded-[20px] overflow-hidden cursor-pointer group bg-black/5 dark:bg-white/5 shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.2)] border border-black/5 dark:border-white/10 transition-all duration-300"
                   onClick={() => setSelectedImage(memory)}
                 >
                   <img
@@ -389,7 +389,7 @@ export default function GalleryApp() {
       {/* Quick Look Image Viewer Overlay */}
       <AnimatePresence>
         {selectedImage && (
-          <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-10">
+          <div className="fixed inset-0 z-[250] flex items-center justify-center p-2 sm:p-10">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

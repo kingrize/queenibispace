@@ -40,7 +40,8 @@ export function DynamicIsland() {
         exit={{ y: -50, opacity: 0, scale: 0.9 }}
         onHoverStart={() => setIsExpanded(true)}
         onHoverEnd={() => setIsExpanded(false)}
-        className="bg-black text-white overflow-hidden shadow-2xl"
+        onClick={() => setIsExpanded((prev) => !prev)}
+        className="bg-black text-white overflow-hidden shadow-2xl cursor-pointer"
         style={{
           borderRadius: isExpanded ? 32 : 24,
         }}
@@ -49,7 +50,7 @@ export function DynamicIsland() {
           layout
           className="flex flex-col"
           style={{
-            width: isExpanded ? 320 : 160,
+            width: isExpanded ? "min(320px, 85vw)" : 160,
             height: isExpanded ? 160 : 40,
           }}
           transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -93,15 +94,15 @@ export function DynamicIsland() {
                 transition={{ duration: 0.2, delay: 0.1 }}
                 className="absolute inset-0 p-4 flex flex-col justify-between"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <img 
                     src={currentTrack.cover} 
                     alt="cover" 
-                    className="w-14 h-14 rounded-2xl object-cover shadow-lg"
+                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover shadow-lg"
                   />
                   <div className="flex flex-col flex-1 min-w-0">
-                    <span className="font-medium text-[15px] truncate">{currentTrack.title}</span>
-                    <span className="text-[13px] text-white/60 truncate">{currentTrack.artist}</span>
+                    <span className="font-medium text-[14px] sm:text-[15px] truncate">{currentTrack.title}</span>
+                    <span className="text-[12px] sm:text-[13px] text-white/60 truncate">{currentTrack.artist}</span>
                   </div>
                   
                   {/* Mini waveform in expanded view too */}
@@ -113,8 +114,8 @@ export function DynamicIsland() {
                 </div>
 
                 {/* Scrubber */}
-                <div className="flex items-center gap-3 mt-4">
-                  <span className="text-[10px] text-white/50 w-8 tabular-nums">{formatTime(currentTime)}</span>
+                <div className="flex items-center gap-2 sm:gap-3 mt-4">
+                  <span className="text-[10px] text-white/50 w-7 sm:w-8 tabular-nums">{formatTime(currentTime)}</span>
                   <div className="flex-1 h-1.5 bg-white/20 rounded-full relative overflow-hidden group">
                     <div 
                       className="absolute top-0 left-0 bottom-0 bg-white rounded-full pointer-events-none" 
@@ -125,22 +126,23 @@ export function DynamicIsland() {
                       min="0" max="100" 
                       value={progress}
                       onChange={(e) => handleSeek(parseFloat(e.target.value))}
+                      onClick={(e) => e.stopPropagation()}
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     />
                   </div>
-                  <span className="text-[10px] text-white/50 w-8 tabular-nums text-right">-{duration ? formatTime(duration - currentTime) : "0:00"}</span>
+                  <span className="text-[10px] text-white/50 w-7 sm:w-8 tabular-nums text-right">-{duration ? formatTime(duration - currentTime) : "0:00"}</span>
                 </div>
 
                 {/* Controls */}
-                <div className="flex justify-center items-center gap-8 mt-2">
-                  <button onClick={skipBackward} className="text-white/80 hover:text-white transition-colors">
-                    <SkipBack className="w-6 h-6 fill-current" />
+                <div className="flex justify-center items-center gap-6 sm:gap-8 mt-2">
+                  <button onClick={(e) => { e.stopPropagation(); skipBackward(); }} className="text-white/80 hover:text-white transition-colors">
+                    <SkipBack className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                   </button>
-                  <button onClick={togglePlay} className="text-white hover:scale-110 transition-transform">
-                    {isPlaying ? <Pause className="w-8 h-8 fill-current" /> : <Play className="w-8 h-8 fill-current ml-1" />}
+                  <button onClick={(e) => { e.stopPropagation(); togglePlay(); }} className="text-white hover:scale-110 transition-transform">
+                    {isPlaying ? <Pause className="w-7 h-7 sm:w-8 sm:h-8 fill-current" /> : <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-current ml-1" />}
                   </button>
-                  <button onClick={skipForward} className="text-white/80 hover:text-white transition-colors">
-                    <SkipForward className="w-6 h-6 fill-current" />
+                  <button onClick={(e) => { e.stopPropagation(); skipForward(); }} className="text-white/80 hover:text-white transition-colors">
+                    <SkipForward className="w-5 h-5 sm:w-6 sm:h-6 fill-current" />
                   </button>
                 </div>
 
