@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/lib/auth-context";
 import { useDesktop } from "@/lib/desktop-context";
-import { Flower2, Gamepad2, FileText, Music, MessageCircle } from "lucide-react";
+import { Flower2, Gamepad2, FileText, Music, MessageCircle, Heart } from "lucide-react";
 import { DesktopIcon } from "@/components/desktop/DesktopIcon";
 import { Window } from "@/components/desktop/Window";
 import { Taskbar } from "@/components/desktop/Taskbar";
@@ -20,6 +20,7 @@ import SettingsApp from "@/components/desktop/apps/SettingsApp";
 import NotesApp from "@/components/desktop/apps/NotesApp";
 import MusicApp from "@/components/desktop/apps/MusicApp";
 import ChatApp from "@/components/desktop/apps/ChatApp";
+import ToMyLoveApp from "@/components/desktop/apps/ToMyLoveApp";
 import { useEffect, useState } from "react";
 
 // App Registry
@@ -31,6 +32,7 @@ const APP_REGISTRY: Record<string, React.ReactNode> = {
   notes: <NotesApp />,
   music: <MusicApp />,
   chat: <ChatApp />,
+  to_my_love: <ToMyLoveApp />,
 };
 
 export default function DesktopEnvironment() {
@@ -64,18 +66,24 @@ export default function DesktopEnvironment() {
         <DesktopIcon id="games" title="Minigames" icon={Gamepad2} delay={0.2} />
         <DesktopIcon id="music" title="Music" icon={Music} delay={0.25} />
         <DesktopIcon id="chat" title="Messages" icon={MessageCircle} delay={0.3} />
+        <DesktopIcon id="to_my_love" title="To My Love" icon={Heart} delay={0.35} />
       </div>
 
       {/* Render Open Windows */}
-      {windows.map((win) => (
-        <Window key={win.id} windowState={win}>
-          {APP_REGISTRY[win.id] || (
-            <div className="p-8 flex flex-col items-center justify-center h-full text-muted-foreground">
-              <p>App not found.</p>
-            </div>
-          )}
-        </Window>
-      ))}
+      {windows.map((win) => {
+        if (win.id === 'to_my_love') {
+          return <ToMyLoveApp key={win.id} />;
+        }
+        return (
+          <Window key={win.id} windowState={win}>
+            {APP_REGISTRY[win.id] || (
+              <div className="p-8 flex flex-col items-center justify-center h-full text-muted-foreground">
+                <p>App not found.</p>
+              </div>
+            )}
+          </Window>
+        );
+      })}
 
       {/* Taskbar / Dock */}
       <Taskbar />
