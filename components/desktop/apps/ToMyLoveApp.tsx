@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Heart, Sparkles, ArrowLeft } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDesktop } from "@/lib/desktop-context";
+
+const GREETING = "To my dearest, <3";
 
 const textToType = `To my dearest, <3
 
@@ -23,6 +25,7 @@ Forever yours,
 
 - Frogini <3`;
 
+/* ─── Canvas Particle Background ─── */
 const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const interactiveRef = useRef(isInteractive);
@@ -55,7 +58,7 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
     const isMobile = width < 768;
     const particleCount = isMobile ? 50 : 80;
 
-    const particles: { x: number; y: number; vx: number; vy: number; radius: number; opacity: number; baseOpacity: number }[] = [];
+    const particles: { x: number; y: number; vx: number; vy: number; radius: number; opacity: number; baseOpacity: number; hue: number }[] = [];
 
     for (let i = 0; i < particleCount; i++) {
       const baseOpacity = Math.random() * 0.5 + 0.1;
@@ -66,7 +69,8 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
         vy: (Math.random() - 0.5) * 0.5,
         radius: Math.random() * (isMobile ? 1.8 : 1.5) + 0.5,
         opacity: baseOpacity,
-        baseOpacity
+        baseOpacity,
+        hue: Math.random() > 0.7 ? 330 : (Math.random() > 0.5 ? 240 : 0) // mix of pink, indigo, and white stars
       });
     }
 
@@ -74,9 +78,7 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
     let pointer = { x: width / 2, y: height / 2, active: false };
     let repulse = { x: -1000, y: -1000, active: false };
 
-    const handleResize = () => {
-      setCanvasSize();
-    };
+    const handleResize = () => setCanvasSize();
     window.addEventListener("resize", handleResize);
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -95,9 +97,7 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
     };
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-    const handleTouchEnd = () => {
-      pointer.active = false;
-    };
+    const handleTouchEnd = () => { pointer.active = false; };
     window.addEventListener("touchend", handleTouchEnd);
 
     const doRepulse = (x: number, y: number) => {
@@ -105,14 +105,10 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
       repulse.x = x;
       repulse.y = y;
       repulse.active = true;
-      setTimeout(() => {
-        repulse.active = false;
-      }, 120);
+      setTimeout(() => { repulse.active = false; }, 120);
     };
 
-    const handleClick = (e: MouseEvent) => {
-      doRepulse(e.clientX, e.clientY);
-    };
+    const handleClick = (e: MouseEvent) => doRepulse(e.clientX, e.clientY);
     window.addEventListener("click", handleClick);
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -132,7 +128,6 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
       time += 0.01;
 
       particles.forEach((p, idx) => {
-        // Repulse on click/tap
         if (repulse.active) {
           const dx = p.x - repulse.x;
           const dy = p.y - repulse.y;
@@ -145,14 +140,12 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
           }
         }
 
-        // Damping
         const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
         if (speed > 0.5) {
           p.vx *= 0.92;
           p.vy *= 0.92;
         }
 
-        // Attract towards pointer when interactive and not repulsing
         if (!repulse.active && interactiveRef.current && pointer.active) {
           const dx = pointer.x - p.x;
           const dy = pointer.y - p.y;
@@ -163,33 +156,36 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
           }
         }
 
-        // Gentle random drift
         p.vx += (Math.random() - 0.5) * 0.08;
         p.vy += (Math.random() - 0.5) * 0.08;
-
         p.x += p.vx;
         p.y += p.vy;
 
-        // Wrap around edges
         if (p.x < 0) p.x = width;
         if (p.x > width) p.x = 0;
         if (p.y < 0) p.y = height;
         if (p.y > height) p.y = 0;
 
-        // Subtle twinkling
         p.opacity = p.baseOpacity + Math.sin(time * 2 + idx) * 0.15;
+        const op = Math.max(0, p.opacity);
 
-        // Draw with soft glow
+        // Colored or white star
+        const color = p.hue === 0
+          ? `rgba(255, 255, 255, ${op})`
+          : `hsla(${p.hue}, 70%, 80%, ${op})`;
+
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(0, p.opacity)})`;
+        ctx.fillStyle = color;
         ctx.fill();
 
-        // Draw glow halo for larger particles
         if (p.radius > 1.2) {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.radius * 3, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(199, 210, 254, ${Math.max(0, p.opacity * 0.08)})`;
+          const glowColor = p.hue === 0
+            ? `rgba(199, 210, 254, ${op * 0.08})`
+            : `hsla(${p.hue}, 60%, 75%, ${op * 0.08})`;
+          ctx.fillStyle = glowColor;
           ctx.fill();
         }
       });
@@ -212,6 +208,101 @@ const ParticleBackground = ({ isInteractive }: { isInteractive: boolean }) => {
   return <canvas ref={canvasRef} className="absolute inset-0 z-0 pointer-events-none" />;
 };
 
+/* ─── Styled Text Renderer ─── */
+const renderTextWithHearts = (str: string) => {
+  const parts = str.split("<3");
+  return (
+    <>
+      {parts.map((part, i) => (
+        <React.Fragment key={i}>
+          {part}
+          {i < parts.length - 1 && (
+            <Heart className="inline-block w-[1em] h-[1em] text-pink-300 fill-pink-300/30 mx-1 align-middle -mt-1 drop-shadow-[0_0_10px_rgba(244,114,182,0.4)]" strokeWidth={1.5} />
+          )}
+        </React.Fragment>
+      ))}
+    </>
+  );
+};
+
+const StyledText = ({ text }: { text: string }) => {
+  if (text.length === 0) return null;
+
+  const greetingEnd = GREETING.length;
+  const isShowingGreeting = text.length <= greetingEnd;
+
+  if (isShowingGreeting) {
+    return (
+      <span
+        className="text-xl sm:text-2xl md:text-3xl font-medium bg-gradient-to-r from-pink-200 via-rose-300 to-pink-200 bg-clip-text text-transparent"
+        style={{ textShadow: "none" }}
+      >
+        {renderTextWithHearts(text)}
+      </span>
+    );
+  }
+
+  // Split into greeting + body
+  const greeting = text.substring(0, greetingEnd);
+  const body = text.substring(greetingEnd);
+
+  return (
+    <>
+      <span
+        className="text-xl sm:text-2xl md:text-3xl font-medium bg-gradient-to-r from-pink-200 via-rose-300 to-pink-200 bg-clip-text text-transparent"
+        style={{ textShadow: "none" }}
+      >
+        {renderTextWithHearts(greeting)}
+      </span>
+      <span>{renderTextWithHearts(body)}</span>
+    </>
+  );
+};
+
+/* ─── Falling Hearts (completion effect) ─── */
+const FallingHearts = () => {
+  const hearts = useMemo(() =>
+    Array.from({ length: 15 }).map((_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      delay: Math.random() * 8,
+      duration: Math.random() * 6 + 8,
+      size: Math.random() * 10 + 6,
+      opacity: Math.random() * 0.15 + 0.05,
+    })), []);
+
+  return (
+    <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+      {hearts.map(h => (
+        <motion.div
+          key={h.id}
+          className="absolute text-pink-300"
+          style={{
+            left: `${h.left}%`,
+            top: -20,
+            fontSize: h.size,
+            opacity: 0,
+          }}
+          animate={{
+            y: [0, window.innerHeight + 40],
+            opacity: [0, h.opacity, h.opacity, 0],
+            rotate: [0, Math.random() > 0.5 ? 30 : -30],
+          }}
+          transition={{
+            duration: h.duration,
+            delay: h.delay,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          ♥
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+/* ─── Main Component ─── */
 export default function ToMyLoveApp() {
   const { closeApp } = useDesktop();
   const [stage, setStage] = useState<"welcome" | "reading">("welcome");
@@ -314,20 +405,40 @@ export default function ToMyLoveApp() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 1.5, ease: "easeInOut" }}
-      className="fixed inset-0 z-[9999] flex flex-col bg-[#050510] overflow-hidden font-serif"
+      className="fixed inset-0 z-[9999] flex flex-col bg-[#050510] overflow-hidden"
+      style={{ fontFamily: "var(--font-cormorant), 'Cormorant Garamond', Georgia, serif" }}
     >
       <audio ref={audioRef} src="/music/Those Eyes.mp3" loop />
       <audio ref={typingAudioRef} src="/music/typing_effect.mp3" loop />
 
       {/* Mystical Background */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        {/* Soft glowing ambient lights */}
-        <div className="absolute top-[10%] left-[10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] bg-indigo-500/10 blur-[100px] md:blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[10%] right-[10%] w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] bg-pink-500/10 blur-[100px] md:blur-[120px] rounded-full mix-blend-screen" />
+        {/* Aurora gradient blobs — slowly drifting */}
+        <motion.div
+          className="absolute top-[5%] left-[5%] w-[80vw] h-[80vw] max-w-[700px] max-h-[700px] rounded-full mix-blend-screen"
+          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)", filter: "blur(100px)" }}
+          animate={{ x: [0, 60, -30, 0], y: [0, -40, 30, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[5%] right-[5%] w-[80vw] h-[80vw] max-w-[700px] max-h-[700px] rounded-full mix-blend-screen"
+          style={{ background: "radial-gradient(circle, rgba(244,114,182,0.10) 0%, transparent 70%)", filter: "blur(100px)" }}
+          animate={{ x: [0, -50, 40, 0], y: [0, 50, -30, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-[40%] left-[50%] w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full mix-blend-screen -translate-x-1/2"
+          style={{ background: "radial-gradient(circle, rgba(168,85,247,0.06) 0%, transparent 70%)", filter: "blur(120px)" }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        />
 
         {/* Interactive Wandering Stars */}
         <ParticleBackground isInteractive={typingDone} />
       </div>
+
+      {/* Falling hearts after completion */}
+      {typingDone && <FallingHearts />}
 
       <AnimatePresence mode="wait">
         {stage === "welcome" && (
@@ -339,25 +450,68 @@ export default function ToMyLoveApp() {
             transition={{ duration: 1.5, ease: "easeInOut" }}
             className="relative z-10 flex-1 flex flex-col items-center justify-center text-center p-6"
           >
-            <motion.div
-              animate={{ y: [-12, 12, -12] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <Sparkles className="w-10 h-10 sm:w-14 sm:h-14 text-indigo-300/60 mb-8 sm:mb-10" strokeWidth={1} />
-            </motion.div>
+            {/* Pulsing ring behind sparkles */}
+            <div className="relative mb-8 sm:mb-10">
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  width: 80,
+                  height: 80,
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  border: "1px solid rgba(165, 180, 252, 0.15)",
+                }}
+                animate={{ scale: [1, 1.8, 1], opacity: [0.4, 0, 0.4] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                style={{
+                  width: 80,
+                  height: 80,
+                  left: "50%",
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  border: "1px solid rgba(244, 114, 182, 0.1)",
+                }}
+                animate={{ scale: [1, 2.2, 1], opacity: [0.3, 0, 0.3] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+              />
+              <motion.div
+                animate={{ y: [-12, 12, -12] }}
+                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Sparkles className="w-10 h-10 sm:w-14 sm:h-14 text-indigo-300/60" strokeWidth={1} />
+              </motion.div>
+            </div>
 
             <h1
-              className="text-2xl sm:text-3xl md:text-5xl text-indigo-50/90 font-light tracking-[0.15em] sm:tracking-[0.25em] mb-10 sm:mb-14"
-              style={{ textShadow: '0 0 30px rgba(165, 180, 252, 0.4)' }}
+              className="text-2xl sm:text-3xl md:text-5xl text-indigo-50/90 font-light tracking-[0.15em] sm:tracking-[0.25em] mb-4 sm:mb-6"
+              style={{ textShadow: "0 0 40px rgba(165, 180, 252, 0.4)" }}
             >
               A REALM FOR YOU
             </h1>
 
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 1.5 }}
+              className="text-xs sm:text-sm text-indigo-200/30 tracking-[0.15em] mb-10 sm:mb-14 italic"
+            >
+              a letter written from the heart
+            </motion.p>
+
             <button
               onClick={handleEnter}
-              className="px-8 sm:px-10 py-3.5 sm:py-4 rounded-full border border-indigo-300/20 text-indigo-200/70 hover:bg-indigo-500/10 hover:text-white hover:border-indigo-300/40 active:bg-indigo-500/20 active:scale-95 transition-all duration-700 tracking-[0.15em] sm:tracking-[0.2em] text-xs sm:text-sm uppercase backdrop-blur-md"
+              className="group relative px-8 sm:px-10 py-3.5 sm:py-4 rounded-full border border-indigo-300/20 text-indigo-200/70 hover:text-white active:scale-95 transition-all duration-700 tracking-[0.15em] sm:tracking-[0.2em] text-xs sm:text-sm uppercase backdrop-blur-md overflow-hidden"
             >
-              Enter softly
+              <span className="relative z-10">Enter softly</span>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-indigo-500/0 via-indigo-500/10 to-pink-500/0"
+                animate={{ x: ["-100%", "100%"] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              />
             </button>
           </motion.div>
         )}
@@ -392,12 +546,12 @@ export default function ToMyLoveApp() {
               </motion.div>
 
               <div className="w-full text-indigo-50/80 leading-[1.9] sm:leading-[2] md:leading-[2.2] text-base sm:text-lg md:text-xl tracking-normal sm:tracking-wide whitespace-pre-wrap font-light">
-                {displayedText}
+                <StyledText text={displayedText} />
                 {displayedText.length < textToType.length && (
                   <motion.span
                     animate={{ opacity: [0, 1, 0] }}
                     transition={{ repeat: Infinity, duration: 0.8 }}
-                    className="inline-block w-[2px] h-[1.2em] ml-1 sm:ml-2 bg-pink-300/70 align-middle rounded-full"
+                    className="inline-block w-[2px] h-[1.2em] ml-1 sm:ml-2 bg-pink-300/70 align-middle rounded-full shadow-[0_0_8px_rgba(244,114,182,0.6),0_0_20px_rgba(244,114,182,0.3)]"
                   />
                 )}
               </div>
@@ -416,7 +570,7 @@ export default function ToMyLoveApp() {
                   >
                     <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-pink-300/40 fill-pink-300/20" strokeWidth={1} />
                   </motion.div>
-                  <span className="text-[10px] sm:text-xs text-indigo-200/30 tracking-[0.2em] uppercase">
+                  <span className="text-[10px] sm:text-xs text-indigo-200/30 tracking-[0.2em] uppercase italic">
                     with all my heart
                   </span>
                 </motion.div>
